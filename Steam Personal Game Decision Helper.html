@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Backlog Picker</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #f4f4f0;
+            color: #111;
+            max-width: 500px;
+            margin: 60px auto;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #111;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 24px;
+        }
+
+        .row {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            background: #fff;
+            border: 1px solid #111;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            background: #111;
+            color: #f4f4f0;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        #resultBox {
+            margin-top: 20px;
+            padding: 14px;
+            border: 1px dashed #111;
+            background: #fff;
+            display: none;
+        }
+
+        .error {
+            color: #b00;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Game Decider Helper</h1>
+<div class="subtitle">Helps you decide when you can't</div>
+
+<div class="row">
+    <label for="genre">Genre</label>
+    <select id="genre">
+        <option value="all">All</option>
+        <option value="Action-Adventure">Action-Adventure</option>
+        <option value="Strategy">Strategy</option>
+        <option value="RPG">RPG</option>
+    </select>
+</div>
+
+<div class="row">
+    <label for="maxHours">Max Hours Played</label>
+    <input type="number" id="maxHours" value="50" min="0">
+</div>
+
+<button onclick="pickGame()">Pick</button>
+
+<div id="errorMessage" class="error"></div>
+
+<div id="resultBox">
+    <div id="outTitle" style="font-weight: bold; margin-bottom: 4px;"></div>
+    <div id="outMeta" style="font-size: 0.85rem; color: #441;"></div>
+</div>
+
+<script>
+    const gameList = [
+        { title: "Sekiro: Shadows Die Twice", category: "Action-Adventure", hoursPlayed: 2, summary: "Tough katana fighting action based in Japan." },
+        { title: "Stellaris", category: "Strategy", hoursPlayed: 206, summary: "Galactic 4x grand strategy with massive dlc content." },
+        { title: "Dishonored 2", category: "Action-Adventure", hoursPlayed: 68, summary: "Quick stealth based in a clockwork fantasy." },
+        { title: "Kenshi", category: "RPG", hoursPlayed: 158, summary: "A unforgiving simulation based indie that was made by a single person." },
+        { title: "Total War: Warhammer III", category: "Strategy", hoursPlayed: 352, summary: "Massive fantasy grand strategy sandbox." },
+        { title: "Kingdom Come: Deliverance I", category: "RPG", hoursPlayed: 164, summary: "Medieval open-world RPG." }
+    ];
+
+    function pickGame() {
+        const selectedGenre = document.getElementById("genre").value;
+        const limit = parseInt(document.getElementById("maxHours").value, 10) || 0;
+        const errorEl = document.getElementById("errorMessage");
+        const box = document.getElementById("resultBox");
+
+        errorEl.textContent = "";
+        box.style.display = "none";
+
+        const valid = gameList.filter(item => {
+            const matchesGenre = (selectedGenre === "all" || item.category === selectedGenre);
+            const matchesTime = item.hoursPlayed <= limit;
+            return matchesGenre && matchesTime;
+        });
+
+        if (valid.length === 0) {
+            errorEl.textContent = "The constraints led to no matches found.";
+            return;
+        }
+
+        const picked = valid[Math.floor(Math.random() * valid.length)];
+
+        document.getElementById("outTitle").textContent = "> " + picked.title;
+        document.getElementById("outMeta").textContent = "[" + picked.category + " | " + picked.hoursPlayed + " hrs] " + picked.summary;
+        box.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
